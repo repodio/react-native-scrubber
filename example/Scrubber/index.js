@@ -51,7 +51,14 @@ export default class extends Component {
         // The most recent move distance is gestureState.move{X,Y}
         // The accumulated gesture distance since becoming responder is
         // gestureState.d{x,y}
-        console.log('onPanResponderMove', { evt, gestureState })
+        const { moveX, moveY, dx, dy } = gestureState;
+        const { dimensionWidth, dimensionOffset } = this.state;
+        const { totalDuration } = this.props;
+
+        const percentScrubbed = Math.min(Math.max((moveX - dimensionOffset) / dimensionWidth, 0), 1);
+        const scrubbingValue = percentScrubbed * totalDuration
+        console.log('onPanResponderMove', { percentScrubbed, scrubbingValue }, ' TOTAL:', this.state.dimensionWidth, this.state.dimensionOffset);
+        this.setState({ scrubbingValue });
       },
       onPanResponderTerminationRequest: (evt, gestureState) => true,
       onPanResponderRelease: (evt, gestureState) => {
@@ -74,6 +81,8 @@ export default class extends Component {
     this.state = {
       scrubbing: false,
       scrubbingValue: 0,
+      dimensionWidth: 0,
+      dimensionOffset: 0,
     };
   }
 
@@ -94,9 +103,12 @@ export default class extends Component {
     this.props.onValueChange(this.state.scrubbingValue);
   }
 
-  onScrubStart = () => {
-
-  }
+  measureProgressBar = () => {
+    this.progressBar.measure((ox, oy, width, height, px, py) => {
+      console.log('ox, oy, width, height, px, py', {ox, oy, width, height, px, py})
+      this.setState({ dimensionWidth: width, dimensionOffset: ox });
+    });
+  };
 
   render() {
     const {
@@ -113,7 +125,7 @@ export default class extends Component {
     const progressPercent = (displayedValue / totalDuration) * 100;
     const scrubbingColor = scrubbing ? {backgroundColor: DefaultColors.scrubbedColor} : {}
     return (
-      <View style={styles.root}>
+      <View style={styles.root} ref={(c) => { this.progressBar = c; }} onLayout={this.measureProgressBar}>
         <View style={styles.trackContainer} >
           <View style={styles.backgroundTrack} />
           <View style={[styles.progressTrack, { width: `${progressPercent}%`, ...scrubbingColor }]} />
@@ -171,9 +183,9 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   trackSlider: {
-    width: 8,
-    height: 8,
-    borderRadius: 8,
+    width: 7,
+    height: 7,
+    borderRadius: 7,
     backgroundColor: DefaultColors.trackColor,
     zIndex: 2,
     left: 50,
