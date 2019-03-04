@@ -1,0 +1,33 @@
+{
+  "name": "react-native-scrubber",
+  "version": "1.0.0",
+  "description": "A Scrubber component for handling audio/video within React Native",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/repodio/react-native-scrubber.git"
+  },
+  "keywords": [
+    "scrubber",
+    "react-native",
+    "ui",
+    "ios",
+    "android",
+    "audio",
+    "video",
+    "swipper",
+    "controls"
+  ],
+  "author": "Repod",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/repodio/react-native-scrubber/issues"
+  },
+  "homepage": "https://github.com/repodio/react-native-scrubber#readme"
+}
