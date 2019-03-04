@@ -4,7 +4,16 @@ import {
   View,
   StyleSheet,
   Text,
+  TouchableWithoutFeedback,
 } from 'react-native'
+
+const DefaultColors = {
+  valueColor: '#999',
+  trackBackgroundColor: '#DDD',
+  trackColor: '#666',
+  scrubbedColor: 'red',
+}
+
 
 formatValue = value => {
   const hours = Math.floor(value / 3600);
@@ -21,6 +30,10 @@ formatValue = value => {
 }
 
 export default class extends Component {
+  state = {
+    scrubbing: false,
+    scrubbingValue: 0,
+  };
 
   static propTypes = {
   }
@@ -35,21 +48,84 @@ export default class extends Component {
     return `-${formatValue(totalDuration - value)}`
   }
 
+  onValueChange = () => {
+    this.props.onValueChange(this.state.scrubbingValue);
+  }
+
   render() {
     const {
       value,
-      onValueChange,
       totalDuration,
     } = this.props;
 
-    return <View style={styles.root}><Text>{this.formattedStartingNumber()} --- {this.formattedEndingNumber()}</Text></View>
+    const {
+      scrubbing,
+      scrubbingValue,
+    } = this.state;
+
+    const displayedValue = scrubbing ? scrubbingValue : value
+    const progressPercent = (displayedValue / totalDuration) * 100;
+
+    return (
+      <View style={styles.root}>
+        <View style={styles.trackContainer} >
+          <View style={styles.backgroundTrack} />
+          <View style={[styles.progressTrack, { width: `${progressPercent}%` }]} />
+          <TouchableWithoutFeedback >
+            <View style={[styles.trackSlider, { left: `${progressPercent}%` }]}  />
+          </TouchableWithoutFeedback>
+        </View>
+        <View style={styles.valuesContainer} >
+          <Text style={styles.value}>{this.formattedStartingNumber()}</Text>
+          <Text style={styles.value}>{this.formattedEndingNumber()}</Text>
+        </View>
+      </View>
+    )
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: 100,
-    height: 50,
-    backgroundColor: 'red'
+  root: {
+    width: '100%',
   },
+  valuesContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  value: {
+    color: DefaultColors.valueColor,
+  },
+  trackContainer: {
+    position: 'relative',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backgroundTrack: {
+    position: 'absolute',
+    height: 3,
+    width: '100%',
+    borderRadius: 3,
+    backgroundColor: DefaultColors.trackBackgroundColor,
+  },
+  progressTrack: {
+    position: 'absolute',
+    height: 3,
+    width: 0,
+    left: 0,
+    borderRadius: 3,
+    backgroundColor: DefaultColors.trackColor,
+    zIndex: 1,
+  },
+  trackSlider: {
+    width: 5,
+    height: 5,
+    borderRadius: 5,
+    backgroundColor: DefaultColors.trackColor,
+    zIndex: 2,
+    left: 50,
+    position: 'absolute',
+  }
 });

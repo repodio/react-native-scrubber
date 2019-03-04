@@ -6,7 +6,7 @@ import Scrubber from './Scrubber/';
 
 export default class App extends React.Component {
   state = {
-    scrubberValue: 0,
+    scrubberValue: 5700,
   }
 
   componentDidMount() {
@@ -26,7 +26,7 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View style={styles.root}>
         <Scrubber 
           value={this.state.scrubberValue}
           onValueChange={this.valueChange}
@@ -38,10 +38,11 @@ export default class App extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 30,
   },
 });
