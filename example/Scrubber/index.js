@@ -221,7 +221,7 @@ export default class extends Component {
       const { dimensionWidth, dimensionOffset } = this.state;
       const { totalDuration } = this.props;
 
-      const boundedX = Math.min(Math.max(this.value.x, 0), dimensionWidth - TrackSliderSize);
+      const boundedX = Math.min(Math.max(this.value.x, 0), dimensionWidth);
 
       const percentScrubbed = boundedX / dimensionWidth;
       const scrubbingValue = percentScrubbed * totalDuration
@@ -269,7 +269,7 @@ export default class extends Component {
     this.animatedValue = new Animated.ValueXY({x: 0, y: 0 })
     this.value = {x: 0, y: 0 }
     this.animatedValue.addListener((value) => {
-      const boundedValue = Math.min(Math.max(value.x, 0), this.state.dimensionWidth - TrackSliderSize);
+      const boundedValue = Math.min(Math.max(value.x, 0), this.state.dimensionWidth);
 
       this.setState({
         startingNumberValue: (boundedValue / this.state.dimensionWidth) * this.props.totalDuration,
@@ -294,7 +294,7 @@ export default class extends Component {
     
     
     const progressPercent = value / totalDuration;
-    const displayPercent = progressPercent * (dimensionWidth - TrackSliderSize);
+    const displayPercent = progressPercent * (dimensionWidth);
     const scrubbingColor = scrubbing ? {backgroundColor: DefaultColors.scrubbedColor} : {}
 
 
@@ -302,8 +302,8 @@ export default class extends Component {
 
     if(dimensionWidth) {
       boundX = this.animatedValue.x.interpolate({
-        inputRange: [0, dimensionWidth - TrackSliderSize],
-         outputRange: [0, dimensionWidth - TrackSliderSize],
+        inputRange: [0, dimensionWidth],
+         outputRange: [0, dimensionWidth],
          extrapolate: 'clamp'
        })
     }
@@ -371,8 +371,6 @@ const styles = StyleSheet.create({
     paddingTop: TrackSliderSize / 2,
     justifyContent: 'center',
     alignItems: 'flex-start',
-    borderWidth: 1,
-    borderColor: 'blue',
   },
   backgroundTrack: {
     position: 'absolute',
@@ -402,12 +400,5 @@ const styles = StyleSheet.create({
     zIndex: 2,
     // left: 0 - TrackSliderSize / 2,
     position: 'absolute',
-  },
-  stats: {
-    justifyContent: 'flex-end',
-    height: 200,
-    borderWidth: 1,
-    borderColor: 'black',
-    borderRadius: 5
   }
 });
