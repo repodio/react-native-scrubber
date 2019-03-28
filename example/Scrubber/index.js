@@ -6,6 +6,7 @@ import {
   Text,
   TouchableWithoutFeedback,
   PanResponder,
+  Animated,
 } from 'react-native'
 
 const DefaultColors = {
@@ -15,6 +16,7 @@ const DefaultColors = {
   scrubbedColor: 'red',
 }
 
+const TrackSliderSize = 10;
 
 formatValue = value => {
   const hours = Math.floor(value / 3600);
@@ -33,51 +35,162 @@ formatValue = value => {
 export default class extends Component {
   constructor(props) {
     super(props);
-    this._panResponder = PanResponder.create({
-      // Ask to be the responder:
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
 
-      onPanResponderGrant: (evt, gestureState) => {
-        // The gesture has started. Show visual feedback so the user knows
-        // what is happening!
-        // gestureState.d{x,y} will be set to zero now
-        console.log('onPanResponderGrant', { evt, gestureState })
-        this.setState({ scrubbing: true, scrubbingValue: this.props.value });
-      },
-      onPanResponderMove: (evt, gestureState) => {
-        // The most recent move distance is gestureState.move{X,Y}
-        // The accumulated gesture distance since becoming responder is
-        // gestureState.d{x,y}
-        const { moveX, moveY, dx, dy } = gestureState;
-        const { dimensionWidth, dimensionOffset } = this.state;
-        const { totalDuration } = this.props;
+    // this._animatedValue = new Animated.ValueXY()
+    // // this._value = {x: 0, y: 0}
 
-        const percentScrubbed = Math.min(Math.max((moveX - dimensionOffset) / dimensionWidth, 0), 1);
-        const scrubbingValue = percentScrubbed * totalDuration
-        console.log('onPanResponderMove', { percentScrubbed, scrubbingValue }, ' TOTAL:', this.state.dimensionWidth, this.state.dimensionOffset);
-        this.setState({ scrubbingValue });
-      },
-      onPanResponderTerminationRequest: (evt, gestureState) => true,
-      onPanResponderRelease: (evt, gestureState) => {
-        // The user has released all touches while this view is the
-        // responder. This typically means a gesture has succeeded
-        console.log('onPanResponderRelease', { evt, gestureState })
-        this.setState({ scrubbing: false });
-      },
-      onPanResponderTerminate: (evt, gestureState) => {
-        // Another component has become the responder, so this gesture
-        // should be cancelled
-        console.log('onPanResponderTerminate', { evt, gestureState })
-      },
-      onShouldBlockNativeResponder: (evt, gestureState) => {
-        // Returns whether this component should block native components from becoming the JS
-        // responder. Returns true by default. Is currently only supported on android.
-        return true;
-      },
-    });
+    // this._animatedValue.addListener((value) => {
+
+    //   // console.log('val: ', value.x, 'width: ', this.state.dimensionWidth, ", offset: ", this.state.dimensionOffset);
+    //   // if(value >= 0 && value <=)
+    //   // const boundedValue = Math.min(Math.max((moveX - dimensionOffset) / dimensionWidth, 0), 1)
+    //   // this._value.x = value.x
+    // });
+
+    // this._panResponder = PanResponder.create({
+    //   // Ask to be the responder:
+    //   onStartShouldSetPanResponder: (evt, gestureState) => true,
+    //   onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+    //   onMoveShouldSetPanResponder: (evt, gestureState) => true,
+    //   onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+
+    //   // onPanResponderGrant: (evt, gestureState) => {
+    //   //   // The gesture has started. Show visual feedback so the user knows
+    //   //   // what is happening!
+    //   //   // gestureState.d{x,y} will be set to zero now
+    //   // },
+    //   onPanResponderGrant: (evt, gestureState) => {
+    //     // console.log('onPanResponderGrant', { evt, gestureState })
+    //     this.setState({ scrubbing: true });
+
+    //     console.log('onPanResponderGrant', this.props.value.toFixed(2), this._animatedValue.x)
+    //     this._animatedValue.setOffset({x: this._animatedValue.x._value});
+    //     this._animatedValue.setValue({x: 0});
+    //   },
+
+    //   onPanResponderMove: (evt, gestureState) => {
+    //     const { moveX, moveY, dx, dy } = gestureState;
+    //     const { dimensionWidth, dimensionOffset } = this.state;
+    //     // const preventUpdating = moveX > (dimensionWidth + dimensionOffset) || moveX < dimensionOffset;
+        
+    //     // if(!preventUpdating) {
+    //       // console.log('Move value', { moveX, dx, preventUpdating, dimensionWidth, dimensionOffset })
+    //       // console.log('Val', this._animatedValue.x)
+    //       // console.log('onPanResponderMove', {
+    //       //   currentVal: this._animatedValue.x,
+    //       //   moveX,
+    //       //   dx,
+    //       // })
+    //       Animated.event([
+    //         null, {dx: this._animatedValue.x, dy: this._animatedValue.y}
+    //       ])(evt, gestureState) 
+    //     // }
+    //   },
+    //   // onMoveShouldSetPanResponderCapture: (e, { moveX, moveY, dx, dy }) => {
+    //   //   // This will make it so the gesture is ignored if it's only short (like a tap).
+    //   //   // You could also use moveX to restrict the gesture to the sides of the screen.
+    //   //   // Something like: moveX <= 50 || moveX >= screenWidth - 50
+    //   //   // (See https://facebook.github.io/react-native/docs/panresponder)
+    //   //   // return Math.abs(dx) > 20;
+    //   //   console.log('onMoveShouldSetPanResponderCapture ', { moveX, moveY, dx, dy })
+    //   //   return true;
+    //   // },
+     
+    //   // onPanResponderMove: (e, { moveX, moveY, dx, dy })=> {
+    //   //   console.log('Move value', { moveX, moveY, dx, dy })
+    //   //   // this._animatedValue.x._value > 0 ? null : Animated.event([
+    //   //   //         null, 
+    //   //   //         {dx: this._animatedValue.x, dy: this._animatedValue.y},
+    //   //   //     ])(e, gestureState)
+    //   //   return Animated.event([
+    //   //     null, {dx: this._animatedValue.x, dy: this._animatedValue.y}
+    //   //   ])
+    //   // },
+      
+    //   // onPanResponderMove: (evt, gestureState) => {
+    //   //   // The most recent move distance is gestureState.move{X,Y}
+    //   //   // The accumulated gesture distance since becoming responder is
+    //   //   // gestureState.d{x,y}
+    //   //   const { moveX, moveY, dx, dy } = gestureState;
+    //   //   const { dimensionWidth, dimensionOffset } = this.state;
+    //   //   const { totalDuration } = this.props;
+
+    //   //   const percentScrubbed = Math.min(Math.max((moveX - dimensionOffset) / dimensionWidth, 0), 1);
+    //   //   const scrubbingValue = percentScrubbed * totalDuration
+    //   //   console.log('onPanResponderMove', { percentScrubbed, scrubbingValue }, ' TOTAL:', this.state.dimensionWidth, this.state.dimensionOffset);
+    //   //   this.setState({ scrubbingValue });
+    //   // },
+    //   onPanResponderTerminationRequest: (evt, gestureState) => true,
+    //   onPanResponderRelease: (evt, gestureState) => {
+    //     // The user has released all touches while this view is the
+    //     // responder. This typically means a gesture has succeeded
+    //     // console.log('onPanResponderRelease', { evt, gestureState })
+    //     const { moveX, moveY, dx, dy } = gestureState;
+    //     const { dimensionWidth, dimensionOffset } = this.state;
+    //     const { totalDuration } = this.props;
+
+    //     const percentScrubbed = Math.min(Math.max((moveX - dimensionOffset) / dimensionWidth, 0), 1);
+    //     const scrubbingValue = percentScrubbed * totalDuration
+    //     console.log('onPanResponderRelease: ', {
+    //       moveX, dx, scrubbingValue
+    //     })
+    //   },
+    //   onPanResponderReject: (evt, gestureState) => {
+    //     // Another component has become the responder, so this gesture
+    //     // should be cancelled
+    //     console.log('onPanResponderReject', { evt, gestureState })
+    //   },
+    //   onPanResponderTerminate: (evt, gestureState) => {
+    //     // Another component has become the responder, so this gesture
+    //     // should be cancelled
+    //     console.log('onPanResponderTerminate', { evt, gestureState })
+    //   },
+    //   onShouldBlockNativeResponder: (evt, gestureState) => {
+    //     // Returns whether this component should block native components from becoming the JS
+    //     // responder. Returns true by default. Is currently only supported on android.
+    //     return true;
+    //   },
+    // });
+
+
+
+
+    // this.animatedValue = new Animated.ValueXY();
+    // this._value = {x: 0, y: 0}
+    // this.animatedValue.addListener((value) => this._value = value);
+    // this.panResponder = PanResponder.create({
+    //   onStartShouldSetPanResponder: (evt, gestureState) => true,
+    //   onMoveShouldSetPanResponder: (evt, gestureState) => true,
+    //   onPanResponderGrant: (e, gestureState) => {
+    //     this.animatedValue.setOffset({
+    //       x: this._value.x,
+    //       y: this._value.y,
+    //     })
+    //     this.animatedValue.setValue({ x: 0, y: 0})
+    //     console.log('onPanResponderGrant', this.animatedValue.x._value)
+    //   },
+    //   onPanResponderMove: Animated.event([
+    //     null, { dx: this.animatedValue.x, dy: this.animatedValue.y}
+    //   ]),
+    //   // onPanResponderMove: () => {
+    //   //   console.log('onMove: ', this.animatedValue.x._value)
+    //   //   return Animated.event([
+    //   //     null, { dx: this.animatedValue.x, dy: this.animatedValue.y}
+    //   //   ])
+    //   // },
+    //   onPanResponderRelease: (e, gestureState) => {
+    //     this.animatedValue.flattenOffset();
+    //     this.setState({ scrubbing: false });
+    //     // this.onValueChange(scrubbingValue)
+
+    //     console.log('onPanResponderRelease', this.animatedValue.x._value)
+    //   },
+    // })
+    this.animatedValue = new Animated.ValueXY({x: 0, y: 0 })
+    this._value = {x: 0, y: 0}
+    this.animatedValue.addListener((value) => this._value = value);
+    this.panResponder = this.createPanHandler()
+
     this.state = {
       scrubbing: false,
       scrubbingValue: 0,
@@ -89,6 +202,41 @@ export default class extends Component {
   static propTypes = {
   }
 
+  createPanHandler = () => PanResponder.create({
+    onStartShouldSetPanResponder: ( event, gestureState ) => true,
+    onMoveShouldSetPanResponder: (event, gestureState) => true,
+    onPanResponderGrant: ( event, gestureState) => {
+      const boundedX = Math.min(Math.max(this.value.x, 0), this.state.dimensionWidth);
+      console.log('onPanResponderGrant', boundedX)
+      this.animatedValue.setOffset({
+        x: boundedX,
+        y: this.value.y
+      })
+      this.setState({ scrubbing: true });
+    },
+    onPanResponderMove: Animated.event([ null, { dx: this.animatedValue.x, dy: this.animatedValue.y}]),
+    onPanResponderRelease: (evt, gestureState) => {
+      // The user has released all touches while this view is the
+      // responder. This typically means a gesture has succeeded
+      // console.log('onPanResponderRelease', { evt, gestureState })
+      const { moveX, moveY, dx, dy } = gestureState;
+      const { dimensionWidth, dimensionOffset } = this.state;
+      const { totalDuration } = this.props;
+
+      const boundedX = Math.min(Math.max(this.value.x, 0), dimensionWidth);
+
+      const percentScrubbed = boundedX / dimensionWidth;
+      const scrubbingValue = percentScrubbed * totalDuration
+      // console.log('onPanResponderRelease: ', {
+      //   scrubbingValue, boundedX: Math.min(Math.max(this.value.x, 0), this.state.dimensionWidth)
+      // })
+      this.onValueChange(scrubbingValue)
+      this.setState({ scrubbing: false });
+      
+
+    },
+  })
+
   formattedStartingNumber = () => {
     const { value } = this.props;
     return formatValue(value)
@@ -99,16 +247,25 @@ export default class extends Component {
     return `-${formatValue(totalDuration - value)}`
   }
 
-  onValueChange = () => {
-    this.props.onValueChange(this.state.scrubbingValue);
+  onValueChange = (scrubbingValue) => {
+    console.log('changing value to ', scrubbingValue)
+    this.props.onValueChange(scrubbingValue);
   }
 
-  measureProgressBar = () => {
-    this.progressBar.measure((ox, oy, width, height, px, py) => {
-      console.log('ox, oy, width, height, px, py', {ox, oy, width, height, px, py})
-      this.setState({ dimensionWidth: width, dimensionOffset: ox });
-    });
-  };
+
+  onLayoutContainer = async (e) => {
+    await this.setState({
+      dimensionWidth: e.nativeEvent.layout.width,
+    })
+    this.initiateAnimator()
+  }
+
+  initiateAnimator = () => {
+    this.animatedValue = new Animated.ValueXY({x: 0, y: 0 })
+    this.value = {x: 0, y: 0 }
+    this.animatedValue.addListener((value) => this.value = value)
+    this.panResponder = this.createPanHandler()
+  }
 
   render() {
     const {
@@ -118,27 +275,64 @@ export default class extends Component {
 
     const {
       scrubbing,
-      scrubbingValue,
+      dimensionWidth,
+      dimensionOffset
     } = this.state;
-
-    const displayedValue = scrubbing ? scrubbingValue : value
-    const progressPercent = (displayedValue / totalDuration) * 100;
+    
+    
+    const progressPercent = value / totalDuration;
+    const displayPercent = progressPercent * (dimensionWidth - TrackSliderSize);
     const scrubbingColor = scrubbing ? {backgroundColor: DefaultColors.scrubbedColor} : {}
+
+
+    let boundX = progressPercent
+
+    if(dimensionWidth) {
+      boundX = this.animatedValue.x.interpolate({
+        inputRange: [0, dimensionWidth - TrackSliderSize],
+         outputRange: [0, dimensionWidth - TrackSliderSize],
+         extrapolate: 'clamp'
+       })
+    }
+
+    const progressWidth = progressPercent * 100
+
+    
     return (
-      <View style={styles.root} ref={(c) => { this.progressBar = c; }} onLayout={this.measureProgressBar}>
-        <View style={styles.trackContainer} >
-          <View style={styles.backgroundTrack} />
-          <View style={[styles.progressTrack, { width: `${progressPercent}%`, ...scrubbingColor }]} />
-          {/* <TouchableWithoutFeedback > */}
-            <View 
-              style={[styles.trackSlider, { left: `${progressPercent}%`, ...scrubbingColor }]} 
-              {...this._panResponder.panHandlers}
-              hitSlop={{top: 15, bottom: 15, left: 15, right: 15}}
-            />
-          {/* </TouchableWithoutFeedback> */}
-        </View>
-        <View style={styles.valuesContainer} >
+      <View style={styles.root}>
+        <View style={styles.valueContainer}>
           <Text style={styles.value}>{this.formattedStartingNumber()}</Text>
+        </View>
+        <View style={styles.trackContainer} onLayout={this.onLayoutContainer}>
+          <View style={styles.backgroundTrack} />
+          <Animated.View 
+            style={[
+              styles.progressTrack,
+              { ...scrubbingColor },
+              !scrubbing 
+                ? { width: `${progressWidth}%`}
+                : { width: boundX }
+            
+            ]} />
+
+          <Animated.View 
+            style={[
+              styles.trackSlider,
+              { ...scrubbingColor },
+              // { left: progressPercent * dimensionWidth },
+              !scrubbing 
+                ? { transform: [{translateX: displayPercent}] }
+                : { transform: [{translateX: boundX}] },
+
+              !scrubbing 
+                ? { transform: [{translateX: displayPercent}] }
+                : { transform: [{translateX: boundX}] },
+            ]} 
+            {...this.panResponder.panHandlers}
+            hitSlop={{top: 15, bottom: 15, left: 15, right: 15}}
+          />
+        </View>
+        <View style={styles.valueContainer}>
           <Text style={styles.value}>{this.formattedEndingNumber()}</Text>
         </View>
       </View>
@@ -149,21 +343,28 @@ export default class extends Component {
 const styles = StyleSheet.create({
   root: {
     width: '100%',
-  },
-  valuesContainer: {
     flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
+  },
+  valueContainer: {
+    flex: 0,
+    width: 60,
+    borderWidth: 1,
+    borderColor: 'red',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   value: {
     color: DefaultColors.valueColor,
   },
   trackContainer: {
+    flex: 1,
     position: 'relative',
     height: 50,
+    paddingTop: TrackSliderSize / 2,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    borderWidth: 1,
+    borderColor: 'blue',
   },
   backgroundTrack: {
     position: 'absolute',
@@ -177,18 +378,28 @@ const styles = StyleSheet.create({
     height: 3,
     width: 0,
     left: 0,
+    // marginLeft: TrackSliderSize / 2,
     borderTopLeftRadius: 3,
     borderBottomLeftRadius: 3,
     backgroundColor: DefaultColors.trackColor,
     zIndex: 1,
   },
   trackSlider: {
-    width: 7,
-    height: 7,
-    borderRadius: 7,
+    width: TrackSliderSize,
+    height: TrackSliderSize,
+    borderRadius: TrackSliderSize,
     backgroundColor: DefaultColors.trackColor,
+    // borderWidth: 1,
+    borderColor: '#fff',
     zIndex: 2,
-    left: 50,
+    // left: 0 - TrackSliderSize / 2,
     position: 'absolute',
+  },
+  stats: {
+    justifyContent: 'flex-end',
+    height: 200,
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: 5
   }
 });

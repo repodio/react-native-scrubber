@@ -1,23 +1,28 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Scrubber from './Scrubber/';
+import TestDrag from './TestDrag';
 
-
+const TOTAL_DURATION = 30000
 
 export default class App extends React.Component {
   state = {
-    scrubberValue: 5700,
+    scrubberValue: 0,
   }
 
   componentDidMount() {
-    this.adjustValue = setInterval(() => {
+    this.valueChangeInterval = setInterval(() => {
       const { scrubberValue } = this.state;
-      this.setState({ scrubberValue: scrubberValue + 1 })
-    }, 1000);
+      if(scrubberValue >= TOTAL_DURATION) {
+        clearInterval(this.valueChangeInterval)
+      } else {
+        this.setState({ scrubberValue: scrubberValue + 1 })
+      }
+    }, 200);
   }
 
   componentWillUnmount() {
-    clearInterval(this.adjustValue);
+    clearInterval(this.valueChangeInterval);
   }
 
   valueChange = value => {
@@ -27,10 +32,11 @@ export default class App extends React.Component {
   render() {
     return (
       <View style={styles.root}>
+        {/* <TestDrag /> */}
         <Scrubber 
           value={this.state.scrubberValue}
           onValueChange={this.valueChange}
-          totalDuration={7300}
+          totalDuration={TOTAL_DURATION}
         />
       </View>
     );
@@ -43,6 +49,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 30,
+    padding: 20,
   },
 });
