@@ -186,16 +186,14 @@ export default class extends Component {
     //     console.log('onPanResponderRelease', this.animatedValue.x._value)
     //   },
     // })
-    this.animatedValue = new Animated.ValueXY({x: 0, y: 0 })
-    this._value = {x: 0, y: 0}
-    this.animatedValue.addListener((value) => this._value = value);
-    this.panResponder = this.createPanHandler()
+    this.initiateAnimator();
 
     this.state = {
       scrubbing: false,
       scrubbingValue: 0,
       dimensionWidth: 0,
       dimensionOffset: 0,
+      startingNumberValue: props.value,
     };
   }
 
@@ -206,7 +204,7 @@ export default class extends Component {
     onStartShouldSetPanResponder: ( event, gestureState ) => true,
     onMoveShouldSetPanResponder: (event, gestureState) => true,
     onPanResponderGrant: ( event, gestureState) => {
-      const boundedX = Math.min(Math.max(this.value.x, 0), this.state.dimensionWidth);
+      const boundedX = Math.min(Math.max(this.value.x, 0), this.state.dimensionWidth - TrackSliderSize);
       console.log('onPanResponderGrant', boundedX)
       this.animatedValue.setOffset({
         x: boundedX,
@@ -223,7 +221,7 @@ export default class extends Component {
       const { dimensionWidth, dimensionOffset } = this.state;
       const { totalDuration } = this.props;
 
-      const boundedX = Math.min(Math.max(this.value.x, 0), dimensionWidth);
+      const boundedX = Math.min(Math.max(this.value.x, 0), dimensionWidth - TrackSliderSize);
 
       const percentScrubbed = boundedX / dimensionWidth;
       const scrubbingValue = percentScrubbed * totalDuration
@@ -232,19 +230,26 @@ export default class extends Component {
       // })
       this.onValueChange(scrubbingValue)
       this.setState({ scrubbing: false });
-      
-
-    },
+    }
   })
 
   formattedStartingNumber = () => {
+    const { scrubbing, startingNumberValue } = this.state;
     const { value } = this.props;
-    return formatValue(value)
+
+    
+    return scrubbing 
+      ? formatValue(startingNumberValue)
+      : formatValue(value)
   }
 
   formattedEndingNumber = () => {
     const { value, totalDuration } = this.props;
-    return `-${formatValue(totalDuration - value)}`
+    const { scrubbing, endingNumberValue } = this.state;
+
+    return `-${scrubbing 
+      ? formatValue(endingNumberValue)
+      : formatValue(totalDuration - value)}`
   }
 
   onValueChange = (scrubbingValue) => {
@@ -263,7 +268,15 @@ export default class extends Component {
   initiateAnimator = () => {
     this.animatedValue = new Animated.ValueXY({x: 0, y: 0 })
     this.value = {x: 0, y: 0 }
-    this.animatedValue.addListener((value) => this.value = value)
+    this.animatedValue.addListener((value) => {
+      const boundedValue = Math.min(Math.max(value.x, 0), this.state.dimensionWidth - TrackSliderSize);
+
+      this.setState({
+        startingNumberValue: (boundedValue / this.state.dimensionWidth) * this.props.totalDuration,
+        endingNumberValue: (1 - (boundedValue / this.state.dimensionWidth)) * this.props.totalDuration
+      })
+      return this.value = value
+    });
     this.panResponder = this.createPanHandler()
   }
 
@@ -300,9 +313,6 @@ export default class extends Component {
     
     return (
       <View style={styles.root}>
-        <View style={styles.valueContainer}>
-          <Text style={styles.value}>{this.formattedStartingNumber()}</Text>
-        </View>
         <View style={styles.trackContainer} onLayout={this.onLayoutContainer}>
           <View style={styles.backgroundTrack} />
           <Animated.View 
@@ -332,7 +342,9 @@ export default class extends Component {
             hitSlop={{top: 15, bottom: 15, left: 15, right: 15}}
           />
         </View>
-        <View style={styles.valueContainer}>
+
+        <View style={styles.valuesContainer} >
+          <Animated.Text style={styles.value}>{this.formattedStartingNumber(boundX)}</Animated.Text>
           <Text style={styles.value}>{this.formattedEndingNumber()}</Text>
         </View>
       </View>
@@ -343,23 +355,19 @@ export default class extends Component {
 const styles = StyleSheet.create({
   root: {
     width: '100%',
-    flexDirection: 'row',
   },
-  valueContainer: {
-    flex: 0,
-    width: 60,
-    borderWidth: 1,
-    borderColor: 'red',
-    justifyContent: 'center',
+  valuesContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   value: {
     color: DefaultColors.valueColor,
   },
   trackContainer: {
-    flex: 1,
     position: 'relative',
-    height: 50,
+    height: 20,
     paddingTop: TrackSliderSize / 2,
     justifyContent: 'center',
     alignItems: 'flex-start',
