@@ -236,8 +236,7 @@ export default class extends Component {
   formattedStartingNumber = () => {
     const { scrubbing, startingNumberValue } = this.state;
     const { value } = this.props;
-
-    
+   
     return scrubbing 
       ? formatValue(startingNumberValue)
       : formatValue(value)
