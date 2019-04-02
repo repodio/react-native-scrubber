@@ -149,6 +149,10 @@ export default class extends Component {
     const {
       value,
       totalDuration,
+      valueColor = DefaultColors.valueColor,
+      trackBackgroundColor = DefaultColors.trackBackgroundColor,
+      trackColor = DefaultColors.trackColor,
+      scrubbedColor = DefaultColors.scrubbedColor,
     } = this.props;
 
     const {
@@ -160,9 +164,24 @@ export default class extends Component {
     
     const progressPercent = value / totalDuration;
     const displayPercent = progressPercent * (dimensionWidth);
-    const scrubbingColor = scrubbing ? {backgroundColor: DefaultColors.scrubbedColor} : {}
+    const scrubberColor = 
+      scrubbing
+        ? { backgroundColor: scrubbedColor }
+        : { backgroundColor: trackColor }
 
+    const progressBarColor = 
+      scrubbing
+        ? { backgroundColor: scrubbedColor }
+        : { backgroundColor: trackColor }
 
+    const startingValueColor = 
+      scrubbing
+        ? { color: scrubbedColor }
+        : { color: valueColor }
+    
+    const backgroundValueColor = { color: valueColor }
+    const backgroundBarColor = { backgroundColor: trackBackgroundColor }
+  
     let boundX = progressPercent
 
     if(dimensionWidth) {
@@ -185,11 +204,11 @@ export default class extends Component {
     return (
       <View style={styles.root}>
         <View style={styles.trackContainer} onLayout={this.onLayoutContainer}>
-          <View style={styles.backgroundTrack} />
+          <View style={[styles.backgroundTrack, backgroundBarColor]} />
           <Animated.View 
             style={[
               styles.progressTrack,
-              { ...scrubbingColor },
+              { ...progressBarColor },
               !scrubbing 
                 ? { width: `${progressWidth}%`}
                 : { width: boundX }
@@ -199,7 +218,7 @@ export default class extends Component {
           <Animated.View 
             style={[
               styles.trackSlider,
-              { ...scrubbingColor },
+              { ...scrubberColor },
               // { left: progressPercent * dimensionWidth },
               
               !scrubbing 
@@ -217,8 +236,8 @@ export default class extends Component {
         </View>
 
         <View style={styles.valuesContainer} >
-          <Animated.Text style={styles.value}>{this.formattedStartingNumber(boundX)}</Animated.Text>
-          <Text style={styles.value}>{this.formattedEndingNumber()}</Text>
+          <Text style={[styles.value, startingValueColor]}>{this.formattedStartingNumber()}</Text>
+          <Text style={[styles.value, backgroundValueColor]}>{this.formattedEndingNumber()}</Text>
         </View>
       </View>
     )
@@ -267,7 +286,6 @@ const styles = StyleSheet.create({
     width: TrackSliderSize,
     height: TrackSliderSize,
     borderRadius: TrackSliderSize,
-    backgroundColor: DefaultColors.trackColor,
     // borderWidth: 1,
     borderColor: '#fff',
     zIndex: 2,
