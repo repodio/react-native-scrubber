@@ -17,6 +17,7 @@ const DefaultColors = {
 }
 
 const TrackSliderSize = 10;
+const SCALE_UP_DURAITON = 150;
 
 formatValue = value => {
   const hours = Math.floor(value / 3600);
@@ -37,6 +38,8 @@ export default class extends Component {
     super(props);
     this.initiateAnimator();
 
+    this.scaleFactor = new Animated.Value(0);
+
     this.state = {
       scrubbing: false,
       scrubbingValue: 0,
@@ -49,6 +52,20 @@ export default class extends Component {
   static propTypes = {
   }
 
+  scaleUp = () => {
+    Animated.timing(this.scaleFactor, {
+        toValue: 1,
+        duration: SCALE_UP_DURAITON
+    }).start();
+  }
+
+  scaleDown = () => {
+    Animated.timing(this.scaleFactor, {
+        toValue: 0,
+        duration: SCALE_UP_DURAITON
+    }).start();
+  }
+
   createPanHandler = () => PanResponder.create({
     onStartShouldSetPanResponder: ( event, gestureState ) => true,
     onMoveShouldSetPanResponder: (event, gestureState) => true,
@@ -59,7 +76,7 @@ export default class extends Component {
         x: boundedX,
         y: this.value.y
       })
-      this.setState({ scrubbing: true });
+      this.setState({ scrubbing: true }, this.scaleUp);
     },
     onPanResponderMove: Animated.event([ null, { dx: this.animatedValue.x, dy: this.animatedValue.y}]),
     onPanResponderRelease: (evt, gestureState) => {
@@ -78,7 +95,7 @@ export default class extends Component {
       //   scrubbingValue, boundedX: Math.min(Math.max(this.value.x, 0), this.state.dimensionWidth)
       // })
       this.onValueChange(scrubbingValue)
-      this.setState({ scrubbing: false });
+      this.setState({ scrubbing: false }, this.scaleDown);
     }
   })
 
@@ -151,10 +168,16 @@ export default class extends Component {
     if(dimensionWidth) {
       boundX = this.animatedValue.x.interpolate({
         inputRange: [0, dimensionWidth],
-         outputRange: [0, dimensionWidth],
-         extrapolate: 'clamp'
-       })
+        outputRange: [0, dimensionWidth],
+        extrapolate: 'clamp'
+      })
     }
+
+    const scaleValue = this.scaleFactor.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1.0, 2.0],
+    })
+    const scaleStyle = { scale: scaleValue };
 
     const progressWidth = progressPercent * 100
 
@@ -178,16 +201,18 @@ export default class extends Component {
               styles.trackSlider,
               { ...scrubbingColor },
               // { left: progressPercent * dimensionWidth },
+              
               !scrubbing 
-                ? { transform: [{translateX: displayPercent}] }
-                : { transform: [{translateX: boundX}] },
+                ? { transform: [{translateX: displayPercent}, scaleStyle] }
+                : { transform: [{translateX: boundX}, scaleStyle] },
 
               !scrubbing 
-                ? { transform: [{translateX: displayPercent}] }
-                : { transform: [{translateX: boundX}] },
+                ? { transform: [{translateX: displayPercent}, scaleStyle] }
+                : { transform: [{translateX: boundX}, scaleStyle] },
+              
             ]} 
             {...this.panResponder.panHandlers}
-            hitSlop={{top: 15, bottom: 15, left: 15, right: 15}}
+            hitSlop={{top: 50, bottom: 50, left: 50, right: 50}}
           />
         </View>
 
