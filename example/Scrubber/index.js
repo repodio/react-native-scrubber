@@ -101,8 +101,8 @@ export default class extends Component {
 
   formattedStartingNumber = () => {
     const { scrubbing, startingNumberValue } = this.state;
-    const { value } = this.props;
-   
+    const { value, totalDuration } = this.props;
+
     return scrubbing 
       ? formatValue(startingNumberValue)
       : formatValue(value)
@@ -111,10 +111,11 @@ export default class extends Component {
   formattedEndingNumber = () => {
     const { value, totalDuration } = this.props;
     const { scrubbing, endingNumberValue } = this.state;
+    const cappedValue = Math.min(totalDuration, value)
 
     return `-${scrubbing 
       ? formatValue(endingNumberValue)
-      : formatValue(totalDuration - value)}`
+      : formatValue(totalDuration - cappedValue)}`
   }
 
   onValueChange = (scrubbingValue) => {
@@ -147,8 +148,8 @@ export default class extends Component {
 
   render() {
     const {
-      value,
-      totalDuration,
+      value = 0,
+      totalDuration = 0,
       valueColor = DefaultColors.valueColor,
       trackBackgroundColor = DefaultColors.trackBackgroundColor,
       trackColor = DefaultColors.trackColor,
@@ -161,8 +162,9 @@ export default class extends Component {
       dimensionOffset
     } = this.state;
     
+    const cappedValue = Math.min(totalDuration, value)
     
-    const progressPercent = value / totalDuration;
+    const progressPercent = cappedValue / totalDuration;
     const displayPercent = progressPercent * (dimensionWidth);
     const scrubberColor = 
       scrubbing
@@ -236,8 +238,8 @@ export default class extends Component {
         </View>
 
         <View style={styles.valuesContainer} >
-          <Text style={[styles.value, startingValueColor]}>{this.formattedStartingNumber()}</Text>
-          <Text style={[styles.value, backgroundValueColor]}>{this.formattedEndingNumber()}</Text>
+          <Text style={startingValueColor}>{this.formattedStartingNumber()}</Text>
+          <Text style={backgroundValueColor}>{this.formattedEndingNumber()}</Text>
         </View>
       </View>
     )
@@ -254,9 +256,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  value: {
-    color: DefaultColors.valueColor,
-  },
   trackContainer: {
     position: 'relative',
     height: 20,
@@ -269,7 +268,6 @@ const styles = StyleSheet.create({
     height: 3,
     width: '100%',
     borderRadius: 3,
-    backgroundColor: DefaultColors.trackBackgroundColor,
   },
   progressTrack: {
     position: 'absolute',
@@ -279,7 +277,6 @@ const styles = StyleSheet.create({
     // marginLeft: TrackSliderSize / 2,
     borderTopLeftRadius: 3,
     borderBottomLeftRadius: 3,
-    backgroundColor: DefaultColors.trackColor,
     zIndex: 1,
   },
   trackSlider: {
