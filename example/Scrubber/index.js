@@ -70,8 +70,12 @@ export default class extends Component {
     onStartShouldSetPanResponder: ( event, gestureState ) => true,
     onMoveShouldSetPanResponder: (event, gestureState) => true,
     onPanResponderGrant: ( event, gestureState) => {
-      const boundedX = Math.min(Math.max(this.value.x, 0), this.state.dimensionWidth - TrackSliderSize);
-      console.log('onPanResponderGrant', boundedX)
+      const { totalDuration, value } = this.props;
+      const currentPercent = Math.min(totalDuration, value) / totalDuration
+      const initialX = currentPercent * this.state.dimensionWidth
+
+      const boundedX = Math.min(Math.max(initialX, 0), this.state.dimensionWidth - TrackSliderSize);
+
       this.animatedValue.setOffset({
         x: boundedX,
         y: this.value.y
@@ -132,6 +136,7 @@ export default class extends Component {
   }
 
   initiateAnimator = () => {
+    
     this.animatedValue = new Animated.ValueXY({x: 0, y: 0 })
     this.value = {x: 0, y: 0 }
     this.animatedValue.addListener((value) => {
