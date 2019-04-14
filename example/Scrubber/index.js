@@ -84,10 +84,6 @@ export default class extends Component {
     },
     onPanResponderMove: Animated.event([ null, { dx: this.animatedValue.x, dy: this.animatedValue.y}]),
     onPanResponderRelease: (evt, gestureState) => {
-      // The user has released all touches while this view is the
-      // responder. This typically means a gesture has succeeded
-      // console.log('onPanResponderRelease', { evt, gestureState })
-      const { moveX, moveY, dx, dy } = gestureState;
       const { dimensionWidth, dimensionOffset } = this.state;
       const { totalDuration } = this.props;
 
@@ -95,9 +91,7 @@ export default class extends Component {
 
       const percentScrubbed = boundedX / dimensionWidth;
       const scrubbingValue = percentScrubbed * totalDuration
-      // console.log('onPanResponderRelease: ', {
-      //   scrubbingValue, boundedX: Math.min(Math.max(this.value.x, 0), this.state.dimensionWidth)
-      // })
+
       this.onValueChange(scrubbingValue)
       this.setState({ scrubbing: false }, this.scaleDown);
     }
@@ -123,7 +117,6 @@ export default class extends Component {
   }
 
   onValueChange = (scrubbingValue) => {
-    console.log('changing value to ', scrubbingValue)
     this.props.onValueChange(scrubbingValue);
   }
 
@@ -141,7 +134,6 @@ export default class extends Component {
     this.value = {x: 0, y: 0 }
     this.animatedValue.addListener((value) => {
       const boundedValue = Math.min(Math.max(value.x, 0), this.state.dimensionWidth);
-
       this.setState({
         startingNumberValue: (boundedValue / this.state.dimensionWidth) * this.props.totalDuration,
         endingNumberValue: (1 - (boundedValue / this.state.dimensionWidth)) * this.props.totalDuration
@@ -279,7 +271,6 @@ const styles = StyleSheet.create({
     height: 3,
     width: 0,
     left: 0,
-    // marginLeft: TrackSliderSize / 2,
     borderTopLeftRadius: 3,
     borderBottomLeftRadius: 3,
     zIndex: 1,
@@ -288,10 +279,8 @@ const styles = StyleSheet.create({
     width: TrackSliderSize,
     height: TrackSliderSize,
     borderRadius: TrackSliderSize,
-    // borderWidth: 1,
     borderColor: '#fff',
     zIndex: 2,
-    // left: 0 - TrackSliderSize / 2,
     position: 'absolute',
   }
 });

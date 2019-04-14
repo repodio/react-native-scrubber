@@ -70,36 +70,36 @@ export default class App extends React.Component {
           value={this.state.scrubberValue1}
           onValueChange={this.valueChange1}
           totalDuration={TOTAL_DURATION_1}
-          trackColor='#8d309b'
-          scrubbedColor='#666'
+          trackColor='#666'
+          scrubbedColor='#8d309b'
         />
         <Scrubber 
           value={this.state.scrubberValue2}
           onValueChange={this.valueChange2}
           totalDuration={TOTAL_DURATION_2}
-          trackColor='#1098F7'
-          scrubbedColor='#666'
+          scrubbedColor='#1098F7'
+          trackColor='#666'
         />
         <Scrubber 
           value={this.state.scrubberValue3}
           onValueChange={this.valueChange3}
           totalDuration={TOTAL_DURATION_3}
-          trackColor='#F0C808'
-          scrubbedColor='#666'
+          scrubbedColor='#F0C808'
+          trackColor='#666'
         />
         <Scrubber 
           value={this.state.scrubberValue4}
           onValueChange={this.valueChange4}
           totalDuration={TOTAL_DURATION_4}
-          trackColor='#FF4242'
-          scrubbedColor='#666'
+          scrubbedColor='#FF4242'
+          trackColor='#666'
         />
         <Scrubber 
           value={this.state.scrubberValue5}
           onValueChange={this.valueChange5}
           totalDuration={TOTAL_DURATION_5}
-          trackColor='#3DDC97'
-          scrubbedColor='#666'
+          scrubbedColor='#3DDC97'
+          trackColor='#666'
         />
       </View>
     );
