@@ -1,11 +1,8 @@
 {
   "name": "react-native-scrubber",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A Scrubber component for handling audio/video within React Native",
   "main": "index.js",
-  "directories": {
-    "example": "example"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
