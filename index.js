@@ -37,7 +37,7 @@ export default class extends Component {
   constructor(props) {
     super(props);
     this.initiateAnimator();
-
+    
     this.scaleFactor = new Animated.Value(0);
 
     this.state = {
@@ -71,7 +71,7 @@ export default class extends Component {
     onMoveShouldSetPanResponder: (event, gestureState) => true,
     onPanResponderGrant: ( event, gestureState) => {
       const { totalDuration, value } = this.props;
-      const currentPercent = Math.min(totalDuration, value) / totalDuration
+      const currentPercent = totalDuration !== 0 ? Math.min(totalDuration, value) / totalDuration : 0
       const initialX = currentPercent * this.state.dimensionWidth
 
       const boundedX = Math.min(Math.max(initialX, 0), this.state.dimensionWidth - TrackSliderSize);
@@ -99,7 +99,7 @@ export default class extends Component {
 
   formattedStartingNumber = () => {
     const { scrubbing, startingNumberValue } = this.state;
-    const { value, totalDuration } = this.props;
+    const { value } = this.props;
 
     return scrubbing 
       ? formatValue(startingNumberValue)
@@ -146,22 +146,23 @@ export default class extends Component {
   render() {
     const {
       value = 0,
-      totalDuration = 0,
+      totalDuration = 1,
       valueColor = DefaultColors.valueColor,
       trackBackgroundColor = DefaultColors.trackBackgroundColor,
       trackColor = DefaultColors.trackColor,
       scrubbedColor = DefaultColors.scrubbedColor,
     } = this.props;
-
+    
     const {
       scrubbing,
       dimensionWidth,
       dimensionOffset
     } = this.state;
     
+    
     const cappedValue = Math.min(totalDuration, value)
     
-    const progressPercent = cappedValue / totalDuration;
+    const progressPercent = totalDuration !== 0 ? cappedValue / totalDuration : 0;
     const displayPercent = progressPercent * (dimensionWidth);
     const scrubberColor = 
       scrubbing
@@ -198,7 +199,6 @@ export default class extends Component {
     const scaleStyle = { scale: scaleValue };
 
     const progressWidth = progressPercent * 100
-
     
     return (
       <View style={styles.root}>
