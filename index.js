@@ -97,7 +97,7 @@ export default class extends Component {
       const percentScrubbed = boundedX / dimensionWidth;
       const scrubbingValue = percentScrubbed * totalDuration
 
-      this.onValueChange(scrubbingValue)
+      this.onSlidingComplete(scrubbingValue)
       this.setState({ scrubbing: false }, this.scaleDown);
     }
   })
@@ -131,8 +131,8 @@ export default class extends Component {
       : formatValue(remainingValue)}`
   }
 
-  onValueChange = (scrubbingValue) => {
-    this.props.onValueChange(scrubbingValue);
+  onSlidingComplete = (scrubbingValue) => {
+    this.props.onSlidingComplete(scrubbingValue);
   }
 
 
