@@ -45,7 +45,6 @@ export default class extends Component {
       scrubbing: false,
       scrubbingValue: 0,
       dimensionWidth: 0,
-      dimensionOffset: 0,
       startingNumberValue: props.value,
     };
   }
@@ -89,7 +88,7 @@ export default class extends Component {
     },
     onPanResponderMove: Animated.event([ null, { dx: this.animatedValue.x, dy: this.animatedValue.y}]),
     onPanResponderRelease: (evt, gestureState) => {
-      const { dimensionWidth, dimensionOffset } = this.state;
+      const { dimensionWidth } = this.state;
       const { totalDuration } = this.props;
 
       const boundedX = Math.min(Math.max(this.value.x, 0), dimensionWidth);
@@ -171,9 +170,7 @@ export default class extends Component {
     const {
       scrubbing,
       dimensionWidth,
-      dimensionOffset
     } = this.state;
-    
     
     const cappedValue = Math.min(totalDuration, value)
     
