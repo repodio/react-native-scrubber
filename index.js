@@ -14,6 +14,7 @@ const DefaultColors = {
   trackBackgroundColor: '#DDD',
   trackColor: '#666',
   scrubbedColor: 'red',
+  bufferedTrackColor: '#999',
 }
 
 const PLACEHOLDER_DISPLAY_VALUE = '--:--';
@@ -160,11 +161,13 @@ export default class extends Component {
   render() {
     const {
       value = 0,
+      bufferedValue = 0,
       totalDuration = 1,
       valueColor = DefaultColors.valueColor,
       trackBackgroundColor = DefaultColors.trackBackgroundColor,
       trackColor = DefaultColors.trackColor,
       scrubbedColor = DefaultColors.scrubbedColor,
+      bufferedTrackColor = DefaultColors.bufferedTrackColor
     } = this.props;
     
     const {
@@ -172,16 +175,23 @@ export default class extends Component {
       dimensionWidth,
     } = this.state;
     
+    // We don't want any value exceeding the totalDuration
     const cappedValue = Math.min(totalDuration, value)
+    const cappedBufferedValue = Math.min(totalDuration, bufferedValue)
     
     const progressPercent = totalDuration !== 0 ? cappedValue / totalDuration : 0;
     const displayPercent = progressPercent * (dimensionWidth);
+    const progressWidth = progressPercent * 100
+
+    const bufferedProgressPercent = totalDuration !== 0 ? cappedBufferedValue / totalDuration : 0;
+    const bufferedProgressWidth = bufferedProgressPercent * 100
+    
     const scrubberColor = 
       scrubbing
         ? { backgroundColor: scrubbedColor }
         : { backgroundColor: trackColor }
 
-    const progressBarColor = 
+    const progressTrackStyle = 
       scrubbing
         ? { backgroundColor: scrubbedColor }
         : { backgroundColor: trackColor }
@@ -192,7 +202,8 @@ export default class extends Component {
         : { color: valueColor }
     
     const backgroundValueColor = { color: valueColor }
-    const backgroundBarColor = { backgroundColor: trackBackgroundColor }
+    const trackBackgroundStyle = { backgroundColor: trackBackgroundColor }
+    const bufferedTrackBackgroundStyle = { backgroundColor: bufferedTrackColor }
   
     let boundX = progressPercent
 
@@ -210,23 +221,33 @@ export default class extends Component {
     })
     const scaleStyle = { scale: scaleValue };
 
-    const progressWidth = progressPercent * 100
     
     return (
       <View style={styles.root}>
         <View style={styles.trackContainer} onLayout={this.onLayoutContainer}>
-          <View style={[styles.backgroundTrack, backgroundBarColor]} />
-          <Animated.View 
+          <View style={[styles.backgroundTrack, trackBackgroundStyle]} />           
+          <View 
+            key='bufferedTrack'
+            style={[
+              styles.bufferedProgressTrack,
+              { ...bufferedTrackBackgroundStyle }, 
+              { width: `${bufferedProgressWidth}%`}        
+            ]}
+          />
+          <Animated.View
+            key='backgroundTrack'
             style={[
               styles.progressTrack,
-              { ...progressBarColor },
+              { ...progressTrackStyle },
               !scrubbing 
                 ? { width: `${progressWidth}%`}
                 : { width: boundX }
             
-            ]} />
+            ]}
+          />
 
           <Animated.View 
+            key='progressTrack'
             style={[
               styles.trackSlider,
               { ...scrubberColor },
@@ -285,6 +306,15 @@ const styles = StyleSheet.create({
     left: 0,
     borderTopLeftRadius: 3,
     borderBottomLeftRadius: 3,
+    zIndex: 2,
+  },
+  bufferedProgressTrack: {
+    position: 'absolute',
+    height: 3,
+    width: 0,
+    left: 0,
+    borderTopLeftRadius: 3,
+    borderBottomLeftRadius: 3,
     zIndex: 1,
   },
   trackSlider: {
@@ -292,7 +322,7 @@ const styles = StyleSheet.create({
     height: TrackSliderSize,
     borderRadius: TrackSliderSize,
     borderColor: '#fff',
-    zIndex: 2,
+    zIndex: 3,
     position: 'absolute',
   }
 });
