@@ -73,7 +73,6 @@ export default class extends Component {
       const { totalDuration, value } = this.props;
       const currentPercent = totalDuration !== 0 ? Math.min(totalDuration, value) / totalDuration : 0
       const initialX = currentPercent * this.state.dimensionWidth
-
       const boundedX = Math.min(Math.max(initialX, 0), this.state.dimensionWidth - TrackSliderSize);
 
       this.animatedValue.setOffset({
@@ -110,10 +109,11 @@ export default class extends Component {
     const { value, totalDuration } = this.props;
     const { scrubbing, endingNumberValue } = this.state;
     const cappedValue = Math.min(totalDuration, value)
+    const remainingValue = totalDuration - cappedValue
 
     return `-${scrubbing 
-      ? formatValue(endingNumberValue)
-      : formatValue(totalDuration - cappedValue)}`
+      ? formatValue(endingNumberValue || remainingValue)
+      : formatValue(remainingValue)}`
   }
 
   onValueChange = (scrubbingValue) => {
