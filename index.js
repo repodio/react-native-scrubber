@@ -75,6 +75,11 @@ export default class extends Component {
       const initialX = currentPercent * this.state.dimensionWidth
       const boundedX = Math.min(Math.max(initialX, 0), this.state.dimensionWidth - TrackSliderSize);
 
+      this.animatedValue.setValue({
+        x: 0,
+        y: 0
+      })
+
       this.animatedValue.setOffset({
         x: boundedX,
         y: this.value.y
