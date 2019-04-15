@@ -22,7 +22,7 @@ Name | Type | Description
 :--- | :--- | :---
 `value` | Number | The current value of the video/audio.
 `onValueChange` | Function | The callback to update the value.
-`totalDuration` | Number | The total duration of the video/audio (Needed to calculated animations within the scrubber)
+`totalDuration` | Number | The total duration of the video/audio (Needed to calculated animations within the scrubber). **Note** If you supply a totalDuration of 0 the starting and ending number will display both as `--:--` since we require the totalDuration to display those numbers. 
 `trackBackgroundColor` | String | Hex color representing the color of the background (Unfilled) track
 `trackColor` | String | Hex color representing the color of the foregroud (Filled) track.
 `scrubbedColor` | String | Hex color represending the color of the foregroud (Filled) track and the dot when the scrubber is active. Also changes the color of the starting number.
