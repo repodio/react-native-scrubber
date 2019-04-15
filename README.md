@@ -4,7 +4,9 @@ A video/audio scrubber for react native.
 #### Todo
 - [x] Animate scrubber
 - [x] Handle buffered value
-- [ ] Add scrubbing callbacks
+- [x] Implement scrubbing
+- [ ] Scrubbing callbacks
+- [ ] Custom scrubbing thresholds and rates
 
 
 ## Install
