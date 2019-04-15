@@ -17,6 +17,21 @@ const DefaultColors = {
   bufferedTrackColor: '#999',
 }
 
+const ScrubbingRates = {
+  half: {
+    threshold: 40,
+    rate: 0.5
+  },
+  quarter: {
+    threshold: 80,
+    rate: 0.25
+  },
+  fine: {
+    threshold: 120,
+    rate: 0.1
+  }
+};
+
 const PLACEHOLDER_DISPLAY_VALUE = '--:--';
 const TrackSliderSize = 10;
 const SCALE_UP_DURAITON = 150;
@@ -38,19 +53,26 @@ formatValue = value => {
 export default class extends Component {
   constructor(props) {
     super(props);
-    this.initiateAnimator();
     
     this.scaleFactor = new Animated.Value(0);
 
     this.state = {
       scrubbing: false,
+      scrubRate: 1,
       scrubbingValue: 0,
       dimensionWidth: 0,
       startingNumberValue: props.value,
     };
+
+    this.initiateAnimator();
+
   }
 
   static propTypes = {
+  }
+
+  componentWillUnmount() {
+    this.animatedValue.removeAllListeners();
   }
 
   scaleUp = () => {
@@ -75,6 +97,9 @@ export default class extends Component {
       const currentPercent = totalDuration !== 0 ? Math.min(totalDuration, value) / totalDuration : 0
       const initialX = currentPercent * this.state.dimensionWidth
       const boundedX = Math.min(Math.max(initialX, 0), this.state.dimensionWidth - TrackSliderSize);
+      
+      this.lastDx = 0
+      this.panResonderMoved = false;
 
       this.animatedValue.setValue({
         x: 0,
@@ -83,11 +108,17 @@ export default class extends Component {
 
       this.animatedValue.setOffset({
         x: boundedX,
-        y: this.value.y
+        y: 0
       })
       this.setState({ scrubbing: true }, this.scaleUp);
     },
-    onPanResponderMove: Animated.event([ null, { dx: this.animatedValue.x, dy: this.animatedValue.y}]),
+    onPanResponderMove: (evt, gestureState) => {
+      this.panResonderMoved = true;
+      const stepValue = (gestureState.dx - this.lastDx) * this.state.scrubRate;
+      this.lastDx = gestureState.dx
+      const newDxValue = this.animatedValue.x._value + (stepValue);
+      this.animatedValue.setValue({x: newDxValue, y: gestureState.dy})
+    },
     onPanResponderRelease: (evt, gestureState) => {
       const { dimensionWidth } = this.state;
       const { totalDuration } = this.props;
@@ -97,8 +128,10 @@ export default class extends Component {
       const percentScrubbed = boundedX / dimensionWidth;
       const scrubbingValue = percentScrubbed * totalDuration
 
-      this.onSlidingComplete(scrubbingValue)
-      this.setState({ scrubbing: false }, this.scaleDown);
+      if(this.panResonderMoved) {
+        this.onSlidingComplete(scrubbingValue)
+      }
+      this.setState({ scrubbing: false, scrubRate: 1 }, this.scaleDown);
     }
   })
 
@@ -110,6 +143,7 @@ export default class extends Component {
       return PLACEHOLDER_DISPLAY_VALUE
     }
 
+    
     return scrubbing 
       ? formatValue(startingNumberValue)
       : formatValue(value)
@@ -143,12 +177,49 @@ export default class extends Component {
     this.initiateAnimator()
   }
 
+  handleScrubRateChange = value => {
+    const { scrubRate } = this.state;
+    if(Math.abs(value.y) > ScrubbingRates.fine.threshold) {
+      if(scrubRate !== ScrubbingRates.fine.rate) {
+        this.setState({ scrubRate: ScrubbingRates.fine.rate })
+      }
+      return
+    }
+
+    if(Math.abs(value.y) > ScrubbingRates.quarter.threshold) {
+      if(scrubRate !== ScrubbingRates.quarter.rate) {
+        this.setState({ scrubRate: ScrubbingRates.quarter.rate })
+      }
+      return
+    }
+    
+    if(Math.abs(value.y) > ScrubbingRates.half.threshold) {
+      if(scrubRate !== ScrubbingRates.half.rate) {
+        this.setState({ scrubRate: ScrubbingRates.half.rate })
+      }
+      return
+    }
+    
+    if(Math.abs(value.y) < ScrubbingRates.half.threshold) {
+      if(scrubRate !== 1) {
+        this.setState({ scrubRate: 1 })  
+      }
+      return
+    }
+  }
+
   initiateAnimator = () => {
     
     this.animatedValue = new Animated.ValueXY({x: 0, y: 0 })
     this.value = {x: 0, y: 0 }
+    this.lastDx = 0
+
     this.animatedValue.addListener((value) => {
+
       const boundedValue = Math.min(Math.max(value.x, 0), this.state.dimensionWidth);
+      
+      this.handleScrubRateChange(value);
+
       this.setState({
         startingNumberValue: (boundedValue / this.state.dimensionWidth) * this.props.totalDuration,
         endingNumberValue: (1 - (boundedValue / this.state.dimensionWidth)) * this.props.totalDuration
