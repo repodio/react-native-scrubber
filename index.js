@@ -16,6 +16,7 @@ const DefaultColors = {
   scrubbedColor: 'red',
 }
 
+const PLACEHOLDER_DISPLAY_VALUE = '--:--';
 const TrackSliderSize = 10;
 const SCALE_UP_DURAITON = 150;
 
@@ -103,7 +104,11 @@ export default class extends Component {
 
   formattedStartingNumber = () => {
     const { scrubbing, startingNumberValue } = this.state;
-    const { value } = this.props;
+    const { value, totalDuration } = this.props;
+
+    if(!totalDuration) {
+      return PLACEHOLDER_DISPLAY_VALUE
+    }
 
     return scrubbing 
       ? formatValue(startingNumberValue)
@@ -115,6 +120,10 @@ export default class extends Component {
     const { scrubbing, endingNumberValue } = this.state;
     const cappedValue = Math.min(totalDuration, value)
     const remainingValue = totalDuration - cappedValue
+
+    if(!totalDuration) {
+      return PLACEHOLDER_DISPLAY_VALUE
+    }
 
     return `-${scrubbing 
       ? formatValue(endingNumberValue || remainingValue)
