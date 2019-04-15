@@ -101,15 +101,15 @@ export default class extends Component {
       this.lastDx = 0
       this.panResonderMoved = false;
 
+      this.animatedValue.setOffset({
+        x: boundedX,
+        y: 0
+      })
       this.animatedValue.setValue({
         x: 0,
         y: 0
       })
 
-      this.animatedValue.setOffset({
-        x: boundedX,
-        y: 0
-      })
       this.setState({ scrubbing: true }, this.scaleUp);
     },
     onPanResponderMove: (evt, gestureState) => {
@@ -215,7 +215,6 @@ export default class extends Component {
     this.lastDx = 0
 
     this.animatedValue.addListener((value) => {
-
       const boundedValue = Math.min(Math.max(value.x, 0), this.state.dimensionWidth);
       
       this.handleScrubRateChange(value);
