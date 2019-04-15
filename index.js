@@ -163,11 +163,11 @@ export default class extends Component {
       value = 0,
       bufferedValue = 0,
       totalDuration = 1,
-      valueColor = DefaultColors.valueColor,
       trackBackgroundColor = DefaultColors.trackBackgroundColor,
       trackColor = DefaultColors.trackColor,
       scrubbedColor = DefaultColors.scrubbedColor,
-      bufferedTrackColor = DefaultColors.bufferedTrackColor
+      bufferedTrackColor = DefaultColors.bufferedTrackColor,
+      displayedValueStyle = { color: DefaultColors.valueColor },
     } = this.props;
     
     const {
@@ -196,12 +196,11 @@ export default class extends Component {
         ? { backgroundColor: scrubbedColor }
         : { backgroundColor: trackColor }
 
-    const startingValueColor = 
+    const startingValueStyle = 
       scrubbing
-        ? { color: scrubbedColor }
-        : { color: valueColor }
+        ? [displayedValueStyle, { color: scrubbedColor }]
+        : displayedValueStyle
     
-    const backgroundValueColor = { color: valueColor }
     const trackBackgroundStyle = { backgroundColor: trackBackgroundColor }
     const bufferedTrackBackgroundStyle = { backgroundColor: bufferedTrackColor }
   
@@ -230,8 +229,8 @@ export default class extends Component {
             key='bufferedTrack'
             style={[
               styles.bufferedProgressTrack,
-              { ...bufferedTrackBackgroundStyle }, 
-              { width: `${bufferedProgressWidth}%`}        
+              { ...bufferedTrackBackgroundStyle },
+              { width: `${bufferedProgressWidth}%`}
             ]}
           />
           <Animated.View
@@ -268,8 +267,8 @@ export default class extends Component {
         </View>
 
         <View style={styles.valuesContainer} >
-          <Text style={startingValueColor}>{this.formattedStartingNumber()}</Text>
-          <Text style={backgroundValueColor}>{this.formattedEndingNumber()}</Text>
+          <Text style={startingValueStyle}>{this.formattedStartingNumber()}</Text>
+          <Text style={displayedValueStyle}>{this.formattedEndingNumber()}</Text>
         </View>
       </View>
     )
