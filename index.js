@@ -124,9 +124,10 @@ export default class extends Component {
     if(!totalDuration) {
       return PLACEHOLDER_DISPLAY_VALUE
     }
+    const scrubbingValue = typeof endingNumberValue === 'number' ? endingNumberValue : remainingValue
 
     return `-${scrubbing 
-      ? formatValue(endingNumberValue || remainingValue)
+      ? formatValue(scrubbingValue)
       : formatValue(remainingValue)}`
   }
 
