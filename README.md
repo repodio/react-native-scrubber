@@ -1,6 +1,8 @@
 # React Native Scrubber
 A video/audio scrubber for react native.
 
+<img src="https://imgur.com/kiiL7pY.gif" width="300" height="256">
+
 #### Todo
 - [x] Animate scrubber
 - [x] Handle buffered value
@@ -78,3 +80,11 @@ state = {
 
 export default Example
 ```
+
+### FAQ
+
+#### What is a scrubber?
+A Scrubber is a component used for audio or video to choose where in the media the user wants to navigate to.
+
+#### Why can't I just use a slider?
+I tried implementing a slider in my app at first and the problem with a slider is new values will be constantly coming in due to the audio or video playing, and a slider will jerk around while the user is scrubbing. Also a user can't fine tune the exact value on large values. Also also the React Native Slider has a limiting styling and no nice animations.
