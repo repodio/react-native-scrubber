@@ -90,6 +90,7 @@ export default class extends Component {
   }
 
   createPanHandler = () => PanResponder.create({
+    onPanResponderTerminationRequest: () => false,
     onStartShouldSetPanResponder: ( event, gestureState ) => true,
     onMoveShouldSetPanResponder: (event, gestureState) => true,
     onPanResponderGrant: ( event, gestureState) => {
