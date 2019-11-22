@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   Text,
-  PanResponder,
   Animated,
 } from 'react-native'
 
