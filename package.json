@@ -1,6 +1,6 @@
 {
   "name": "react-native-scrubber",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A Scrubber component for handling audio/video within React Native",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,11 @@
     "swipper",
     "controls"
   ],
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-gesture-handler": "*"
+  },
   "author": "Repod",
   "license": "ISC",
   "bugs": {
