@@ -1,13 +1,18 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import {
   View,
   StyleSheet,
   Text,
-  TouchableWithoutFeedback,
   PanResponder,
   Animated,
 } from 'react-native'
+
+import {
+  PanGestureHandler,
+  TapGestureHandler,
+  State,
+} from 'react-native-gesture-handler';
+
 
 const DefaultColors = {
   valueColor: '#999',
@@ -64,6 +69,23 @@ export default class extends Component {
       startingNumberValue: props.value,
     };
 
+
+    this._translateX = new Animated.Value(0);
+    this._translateY = new Animated.Value(0);
+
+    this._lastOffset = { x: 0, y: 0 };
+    this._onGestureEvent = Animated.event(
+      [
+        {
+          nativeEvent: {
+            translationX: this._translateX,
+            translationY: this._translateY,
+          },
+        },
+      ],
+      { useNativeDriver: false }
+    );
+
     this.initiateAnimator();
 
   }
@@ -72,7 +94,7 @@ export default class extends Component {
   }
 
   componentWillUnmount() {
-    this.animatedValue.removeAllListeners();
+    this._translateX.removeAllListeners();
   }
 
   scaleUp = () => {
@@ -89,42 +111,34 @@ export default class extends Component {
     }).start();
   }
 
-  createPanHandler = () => PanResponder.create({
-    onPanResponderTerminationRequest: () => false,
-    onStartShouldSetPanResponder: ( event, gestureState ) => true,
-    onMoveShouldSetPanResponder: (event, gestureState) => true,
-    onPanResponderGrant: ( event, gestureState) => {
+  _onHandlerStateChange = event => {
+
+    if (event.nativeEvent.state === State.BEGAN) {      
       const { totalDuration, value } = this.props;
       const currentPercent = totalDuration !== 0 ? Math.min(totalDuration, value) / totalDuration : 0
       const initialX = currentPercent * this.state.dimensionWidth
       const boundedX = Math.min(Math.max(initialX, 0), this.state.dimensionWidth - TrackSliderSize);
       
-      this.lastDx = 0
       this.panResonderMoved = false;
 
-      this.animatedValue.setOffset({
-        x: boundedX,
-        y: 0
-      })
-      this.animatedValue.setValue({
-        x: 0,
-        y: 0
-      })
+      this._lastOffset.x = boundedX
 
       this.setState({ scrubbing: true }, this.scaleUp);
-    },
-    onPanResponderMove: (evt, gestureState) => {
+    } else if (event.nativeEvent.state === State.ACTIVE) {
       this.panResonderMoved = true;
-      const stepValue = (gestureState.dx - this.lastDx) * this.state.scrubRate;
-      this.lastDx = gestureState.dx
-      const newDxValue = this.animatedValue.x._value + (stepValue);
-      this.animatedValue.setValue({x: newDxValue, y: gestureState.dy})
-    },
-    onPanResponderRelease: (evt, gestureState) => {
+      this._lastOffset.x += event.nativeEvent.translationX;
+      this._lastOffset.y += event.nativeEvent.translationY;
+      this._translateX.setOffset(this._lastOffset.x);
+      this._translateX.setValue(0);
+      this._translateY.setOffset(this._lastOffset.y);
+      this._translateY.setValue(0);
+    } else if (event.nativeEvent.state === State.END) {
       const { dimensionWidth } = this.state;
       const { totalDuration } = this.props;
 
-      const boundedX = Math.min(Math.max(this.value.x, 0), dimensionWidth);
+      this._lastOffset.x = this._lastOffset.x + this._translateX._value
+
+      const boundedX = Math.min(Math.max(this._lastOffset.x, 0), dimensionWidth);
 
       const percentScrubbed = boundedX / dimensionWidth;
       const scrubbingValue = percentScrubbed * totalDuration
@@ -132,9 +146,11 @@ export default class extends Component {
       if(this.panResonderMoved) {
         this.onSlidingComplete(scrubbingValue)
       }
+      
       this.setState({ scrubbing: false, scrubRate: 1 }, this.scaleDown);
+
     }
-  })
+  };
 
   formattedStartingNumber = () => {
     const { scrubbing, startingNumberValue } = this.state;
@@ -210,23 +226,15 @@ export default class extends Component {
   }
 
   initiateAnimator = () => {
-    
-    this.animatedValue = new Animated.ValueXY({x: 0, y: 0 })
-    this.value = {x: 0, y: 0 }
-    this.lastDx = 0
-
-    this.animatedValue.addListener((value) => {
-      const boundedValue = Math.min(Math.max(value.x, 0), this.state.dimensionWidth);
+    this._translateX.addListener(({ value }) => {
+      const boundedValue = Math.min(Math.max(value, 0), this.state.dimensionWidth);
       
-      this.handleScrubRateChange(value);
-
       this.setState({
         startingNumberValue: (boundedValue / this.state.dimensionWidth) * this.props.totalDuration,
         endingNumberValue: (1 - (boundedValue / this.state.dimensionWidth)) * this.props.totalDuration
       })
-      return this.value = value
+      return;
     });
-    this.panResponder = this.createPanHandler()
   }
 
   render() {
@@ -253,7 +261,6 @@ export default class extends Component {
     const progressPercent = totalDuration !== 0 ? cappedValue / totalDuration : 0;
     const displayPercent = progressPercent * (dimensionWidth);
     const progressWidth = progressPercent * 100
-
     const bufferedProgressPercent = totalDuration !== 0 ? cappedBufferedValue / totalDuration : 0;
     const bufferedProgressWidth = bufferedProgressPercent * 100
     
@@ -278,7 +285,7 @@ export default class extends Component {
     let boundX = progressPercent
 
     if(dimensionWidth) {
-      boundX = this.animatedValue.x.interpolate({
+      boundX = this._translateX.interpolate({
         inputRange: [0, dimensionWidth],
         outputRange: [0, dimensionWidth],
         extrapolate: 'clamp'
@@ -309,32 +316,35 @@ export default class extends Component {
             style={[
               styles.progressTrack,
               { ...progressTrackStyle },
-              !scrubbing 
+              !scrubbing
                 ? { width: `${progressWidth}%`}
                 : { width: boundX }
-            
             ]}
           />
-
-          <Animated.View 
-            key='progressTrack'
-            style={[
-              styles.trackSlider,
-              { ...scrubberColor },
-              // { left: progressPercent * dimensionWidth },
-              
-              !scrubbing 
-                ? { transform: [{translateX: displayPercent}, scaleStyle] }
-                : { transform: [{translateX: boundX}, scaleStyle] },
-
-              !scrubbing 
-                ? { transform: [{translateX: displayPercent}, scaleStyle] }
-                : { transform: [{translateX: boundX}, scaleStyle] },
-              
-            ]} 
-            {...this.panResponder.panHandlers}
-            hitSlop={{top: 50, bottom: 50, left: 50, right: 50}}
-          />
+          <PanGestureHandler
+            onGestureEvent={this._onGestureEvent}
+            onHandlerStateChange={this._onHandlerStateChange}
+            minDist={0}
+          >
+            <Animated.View
+              style={[
+                styles.trackSliderWrapper,
+                !scrubbing
+                    ? { left: displayPercent - (TrackSliderSize / 2) }
+                    : { transform: [{translateX: boundX}] },
+              ]}
+              hitSlop={{top: 20, bottom: 20, left: 50, right: 50}}
+            >
+              <Animated.View 
+                key='progressTrack'
+                style={[
+                  styles.trackSlider,
+                  { ...scrubberColor },
+                  { transform: [scaleStyle] },
+                ]} 
+              />
+            </Animated.View>
+          </PanGestureHandler>
         </View>
 
         <View style={styles.valuesContainer} >
@@ -387,12 +397,15 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 3,
     zIndex: 1,
   },
+  trackSliderWrapper: {
+    zIndex: 3,
+    position: 'absolute',
+    left: 0 - (TrackSliderSize / 2),
+  },
   trackSlider: {
     width: TrackSliderSize,
     height: TrackSliderSize,
     borderRadius: TrackSliderSize,
     borderColor: '#fff',
-    zIndex: 3,
-    position: 'absolute',
   }
 });
