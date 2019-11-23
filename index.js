@@ -324,6 +324,7 @@ export default class extends Component {
             onGestureEvent={this._onGestureEvent}
             onHandlerStateChange={this._onHandlerStateChange}
             minDist={0}
+            hitSlop={{top: 20, bottom: 20, left: 50, right: 50}}
           >
             <Animated.View
               style={[
