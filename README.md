@@ -16,7 +16,7 @@ A video/audio scrubber for react native.
 ```
 npm install react-native-scrubber 
 or 
-yarn add react-native-scrubber`
+yarn add react-native-scrubber
 
 import Scrubber from 'react-native-scrubber'
 ``` 
