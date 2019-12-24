@@ -26,6 +26,7 @@
     "react-native": "*",
     "react-native-gesture-handler": "*"
   },
+  "types": "index.d.ts",
   "author": "Repod",
   "license": "ISC",
   "bugs": {
