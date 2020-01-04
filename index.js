@@ -122,6 +122,9 @@ export default class extends Component {
 
       this._lastOffset.x = boundedX
 
+      this._translateX.setOffset(boundedX);
+      this._translateX.setValue(0);
+
       this.setState({ scrubbing: true }, this.scaleUp);
     } else if (event.nativeEvent.state === State.ACTIVE) {
       this.panResonderMoved = true;
