@@ -21,6 +21,11 @@ yarn add react-native-scrubber
 import Scrubber from 'react-native-scrubber'
 ``` 
 
+If you are using Expo, you are done.
+
+If you don't use Expo, install and link [react-native-gesture-handler](https://github.com/software-mansion/react-native-gesture-handler).
+
+
 ### Props
 
 Name | Type | Description
