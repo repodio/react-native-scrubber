@@ -128,12 +128,6 @@ export default class extends Component {
       this.setState({ scrubbing: true }, this.scaleUp);
     } else if (event.nativeEvent.state === State.ACTIVE) {
       this.panResonderMoved = true;
-      this._lastOffset.x += event.nativeEvent.translationX;
-      this._lastOffset.y += event.nativeEvent.translationY;
-      this._translateX.setOffset(this._lastOffset.x);
-      this._translateX.setValue(0);
-      this._translateY.setOffset(this._lastOffset.y);
-      this._translateY.setValue(0);
     } else if (event.nativeEvent.state === State.END) {
       const { dimensionWidth } = this.state;
       const { totalDuration } = this.props;
