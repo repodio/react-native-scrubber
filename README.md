@@ -39,6 +39,7 @@ Name | Type | Description
 `bufferedTrackColor` | String | Hex color representing the color of the buffered track which sits inbetween the background track and the progress track.
 `scrubbedColor` | String | Hex color represending the color of the foregroud (Filled) track and the dot when the scrubber is active. Also changes the color of the starting number.
 `displayedValueStyle` | Object | This stlye is applied to both the displayed values
+`displayValues` | Boolean | Defaults to `true`, if set false will hide the numbers under the scrub bar.
 
 ## Example
 
