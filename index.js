@@ -122,15 +122,12 @@ export default class extends Component {
 
       this._lastOffset.x = boundedX
 
+      this._translateX.setOffset(boundedX);
+      this._translateX.setValue(0);
+
       this.setState({ scrubbing: true }, this.scaleUp);
     } else if (event.nativeEvent.state === State.ACTIVE) {
       this.panResonderMoved = true;
-      this._lastOffset.x += event.nativeEvent.translationX;
-      this._lastOffset.y += event.nativeEvent.translationY;
-      this._translateX.setOffset(this._lastOffset.x);
-      this._translateX.setValue(0);
-      this._translateY.setOffset(this._lastOffset.y);
-      this._translateY.setValue(0);
     } else if (event.nativeEvent.state === State.END) {
       const { dimensionWidth } = this.state;
       const { totalDuration } = this.props;
@@ -236,6 +233,14 @@ export default class extends Component {
     });
   }
 
+  onTap = ({nativeEvent}) => {
+    if (nativeEvent.state === State.END && this.props.tapNavigation) {
+      const { dimensionWidth } = this.state;
+      const { totalDuration } = this.props;
+      this.onSlidingComplete((nativeEvent.x / dimensionWidth) * totalDuration);
+    }
+  }
+
   render() {
     const {
       value = 0,
@@ -301,7 +306,13 @@ export default class extends Component {
     return (
       <View style={styles.root}>
         <View style={styles.trackContainer} onLayout={this.onLayoutContainer}>
-          <View style={[styles.backgroundTrack, trackBackgroundStyle]} />           
+          <TapGestureHandler
+            onHandlerStateChange={this.onTap}
+            maxDurationMs={2000}
+            hitSlop={{top: 20, bottom: 20, left: 0, right: 0 }}
+          >
+            <View style={[styles.backgroundTrack, trackBackgroundStyle]} />
+          </TapGestureHandler>
           <View 
             key='bufferedTrack'
             style={[
