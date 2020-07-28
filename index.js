@@ -184,11 +184,15 @@ export default class extends Component {
   };
 
   onSlidingStart = () => {
-    this.props.onSlidingStart();
+    if (typeof this.props.onSlide === 'function') {
+      this.props.onSlidingStart();
+    }
   }
 
   onSlide = (scrubbingValue) => {
-    this.props.onSlide(scrubbingValue);
+    if (typeof this.props.onSlide === 'function') {
+      this.props.onSlide(scrubbingValue);
+    }
   }
 
   onLayoutContainer = async (e) => {
