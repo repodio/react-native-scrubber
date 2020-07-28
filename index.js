@@ -90,14 +90,16 @@ export default class extends Component {
   scaleUp = () => {
     Animated.timing(this.scaleFactor, {
       toValue: 1,
-      duration: SCALE_UP_DURAITON,
+	  duration: SCALE_UP_DURAITON,
+	  useNativeDriver: false,
     }).start();
   };
 
   scaleDown = () => {
     Animated.timing(this.scaleFactor, {
       toValue: 0,
-      duration: SCALE_UP_DURAITON,
+	  duration: SCALE_UP_DURAITON,
+	  useNativeDriver: false,
     }).start();
   };
 
