@@ -6,6 +6,7 @@ interface ScrubberProps {
   bufferedValue?: number;
   totalDuration?: number;
   onSlidingComplete: (value: number) => void;
+  onSlidingStart?: (value: number) => any;
   tapNavigation?: boolean;
   trackBackgroundColor?: string;
   trackColor?: string;
