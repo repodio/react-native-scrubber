@@ -185,6 +185,10 @@ export default class extends Component {
     this.props.onSlidingStart();
   }
 
+  onSlide = (scrubbingValue) => {
+    this.props.onSlide(scrubbingValue);
+  }
+
   onLayoutContainer = async (e) => {
     await this.setState({
       dimensionWidth: e.nativeEvent.layout.width,
@@ -229,14 +233,17 @@ export default class extends Component {
         Math.max(value, 0),
         this.state.dimensionWidth
       );
+    
+      const startingNumberValue = (boundedValue / this.state.dimensionWidth) * this.props.totalDuration;
 
       this.setState({
-        startingNumberValue:
-          (boundedValue / this.state.dimensionWidth) * this.props.totalDuration,
+        startingNumberValue,
         endingNumberValue:
           (1 - boundedValue / this.state.dimensionWidth) *
           this.props.totalDuration,
       });
+    
+      this.onSlide(startingNumberValue);
       return;
     });
   };
