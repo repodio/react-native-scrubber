@@ -124,6 +124,7 @@ export default class extends Component {
       this._translateX.setValue(0);
 
       this.setState({ scrubbing: true }, this.scaleUp);
+      this.onSlidingStart();
     } else if (event.nativeEvent.state === State.ACTIVE) {
       this.panResonderMoved = true;
     } else if (event.nativeEvent.state === State.END) {
@@ -181,6 +182,10 @@ export default class extends Component {
   onSlidingComplete = (scrubbingValue) => {
     this.props.onSlidingComplete(scrubbingValue);
   };
+
+  onSlidingStart = () => {
+    this.props.onSlidingStart();
+  }
 
   onLayoutContainer = async (e) => {
     await this.setState({
