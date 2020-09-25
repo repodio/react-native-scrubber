@@ -124,6 +124,7 @@ export default class extends Component {
       this._translateX.setValue(0);
 
       this.setState({ scrubbing: true }, this.scaleUp);
+      this.onSlidingStart();
     } else if (event.nativeEvent.state === State.ACTIVE) {
       this.panResonderMoved = true;
     } else if (event.nativeEvent.state === State.END) {
@@ -182,6 +183,18 @@ export default class extends Component {
     this.props.onSlidingComplete(scrubbingValue);
   };
 
+  onSlidingStart = () => {
+    if (typeof this.props.onSlide === 'function') {
+      this.props.onSlidingStart();
+    }
+  }
+
+  onSlide = (scrubbingValue) => {
+    if (typeof this.props.onSlide === 'function') {
+      this.props.onSlide(scrubbingValue);
+    }
+  }
+
   onLayoutContainer = async (e) => {
     await this.setState({
       dimensionWidth: e.nativeEvent.layout.width,
@@ -226,14 +239,17 @@ export default class extends Component {
         Math.max(value, 0),
         this.state.dimensionWidth
       );
+    
+      const startingNumberValue = (boundedValue / this.state.dimensionWidth) * this.props.totalDuration;
 
       this.setState({
-        startingNumberValue:
-          (boundedValue / this.state.dimensionWidth) * this.props.totalDuration,
+        startingNumberValue,
         endingNumberValue:
           (1 - boundedValue / this.state.dimensionWidth) *
           this.props.totalDuration,
       });
+    
+      this.onSlide(startingNumberValue);
       return;
     });
   };
