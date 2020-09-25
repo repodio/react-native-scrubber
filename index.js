@@ -91,6 +91,7 @@ export default class extends Component {
     Animated.timing(this.scaleFactor, {
       toValue: 1,
       duration: SCALE_UP_DURAITON,
+      useNativeDriver: false,
     }).start();
   };
 
@@ -98,6 +99,7 @@ export default class extends Component {
     Animated.timing(this.scaleFactor, {
       toValue: 0,
       duration: SCALE_UP_DURAITON,
+      useNativeDriver: false,
     }).start();
   };
 
