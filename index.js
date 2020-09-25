@@ -34,7 +34,7 @@ const PLACEHOLDER_DISPLAY_VALUE = "--:--";
 const TrackSliderSize = 10;
 const SCALE_UP_DURAITON = 150;
 
-formatValue = (value) => {
+let formatValue = (value) => {
   const hours = Math.floor(value / 3600);
   const rawMinutes = value / 60 - 60 * hours;
   const minutes = Math.floor(rawMinutes);
