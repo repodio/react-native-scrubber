@@ -184,7 +184,7 @@ export default class extends Component {
   };
 
   onSlidingStart = () => {
-    if (typeof this.props.onSlide === 'function') {
+    if (typeof this.props.onSlidingStart === 'function') {
       this.props.onSlidingStart();
     }
   }
