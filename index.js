@@ -60,6 +60,7 @@ export default class extends Component {
       scrubbingValue: 0,
       dimensionWidth: 0,
       startingNumberValue: props.value,
+      value: props.value || 0,
     };
 
     this._translateX = new Animated.Value(0);
@@ -86,6 +87,12 @@ export default class extends Component {
   componentWillUnmount() {
     this._translateX.removeAllListeners();
   }
+  
+  setValue(value) {
+    if (typeof value === 'number') {
+      this.setState({ ...this.state, value });
+    }
+  }
 
   scaleUp = () => {
     Animated.timing(this.scaleFactor, {
@@ -105,7 +112,8 @@ export default class extends Component {
 
   _onHandlerStateChange = (event) => {
     if (event.nativeEvent.state === State.BEGAN) {
-      const { totalDuration, value } = this.props;
+      const { totalDuration } = this.props;
+      const value = this.props.value || this.state.value;
       const currentPercent =
         totalDuration !== 0
           ? Math.min(totalDuration, value) / totalDuration
@@ -151,7 +159,8 @@ export default class extends Component {
 
   formattedStartingNumber = () => {
     const { scrubbing, startingNumberValue } = this.state;
-    const { value, totalDuration } = this.props;
+    const { totalDuration } = this.props;
+    const value = this.props.value || this.state.value;
 
     if (!totalDuration) {
       return PLACEHOLDER_DISPLAY_VALUE;
@@ -161,7 +170,8 @@ export default class extends Component {
   };
 
   formattedEndingNumber = () => {
-    const { value, totalDuration } = this.props;
+    const { totalDuration } = this.props;
+    const value = this.props.value || this.state.value;
     const { scrubbing, endingNumberValue } = this.state;
     const cappedValue = Math.min(totalDuration, value);
     const remainingValue = totalDuration - cappedValue;
@@ -264,7 +274,6 @@ export default class extends Component {
 
   render() {
     const {
-      value = 0,
       bufferedValue = 0,
       totalDuration = 1,
       trackBackgroundColor = DefaultColors.trackBackgroundColor,
@@ -274,6 +283,7 @@ export default class extends Component {
       displayedValueStyle = { color: DefaultColors.valueColor },
       displayValues = true,
     } = this.props;
+    const value = this.props.value || this.state.value;
 
     const { scrubbing, dimensionWidth } = this.state;
 

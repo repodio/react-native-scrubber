@@ -17,6 +17,8 @@ interface ScrubberProps {
   displayValues?: boolean;
 }
 
-declare class Scrubber extends Component<ScrubberProps, any> {}
+declare class Scrubber extends Component<ScrubberProps, any> {
+  setValue: (value: number) => void;
+}
 
 export = Scrubber;
