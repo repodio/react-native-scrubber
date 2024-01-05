@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { View, StyleSheet, Text, Animated } from "react-native";
 
 import {
+  GestureHandlerRootView,
   PanGestureHandler,
   TapGestureHandler,
   State,
@@ -323,7 +324,7 @@ export default class extends Component {
     const scaleStyle = { scale: scaleValue };
 
     return (
-      <View style={styles.root}>
+      <GestureHandlerRootView style={styles.root}>
         <View style={styles.trackContainer} onLayout={this.onLayoutContainer}>
           <TapGestureHandler
             onHandlerStateChange={this.onTap}
@@ -384,7 +385,7 @@ export default class extends Component {
             </Text>
           </View>
         ) : null}
-      </View>
+      </GestureHandlerRootView>
     );
   }
 }
