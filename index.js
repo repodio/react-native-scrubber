@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { View, StyleSheet, Text, Animated } from "react-native";
 
 import {
+  GestureHandlerRootView,
   PanGestureHandler,
   TapGestureHandler,
   State,
@@ -75,7 +76,7 @@ export default class extends Component {
           },
         },
       ],
-      { useNativeDriver: false }
+      { useNativeDriver: false },
     );
 
     this.initiateAnimator();
@@ -113,7 +114,7 @@ export default class extends Component {
       const initialX = currentPercent * this.state.dimensionWidth;
       const boundedX = Math.min(
         Math.max(initialX, 0),
-        this.state.dimensionWidth - TrackSliderSize
+        this.state.dimensionWidth - TrackSliderSize,
       );
 
       this.panResonderMoved = false;
@@ -135,7 +136,7 @@ export default class extends Component {
 
       const boundedX = Math.min(
         Math.max(this._lastOffset.x, 0),
-        dimensionWidth
+        dimensionWidth,
       );
 
       const percentScrubbed = boundedX / dimensionWidth;
@@ -184,16 +185,16 @@ export default class extends Component {
   };
 
   onSlidingStart = () => {
-    if (typeof this.props.onSlidingStart === 'function') {
+    if (typeof this.props.onSlidingStart === "function") {
       this.props.onSlidingStart();
     }
-  }
+  };
 
   onSlide = (scrubbingValue) => {
-    if (typeof this.props.onSlide === 'function') {
+    if (typeof this.props.onSlide === "function") {
       this.props.onSlide(scrubbingValue);
     }
-  }
+  };
 
   onLayoutContainer = async (e) => {
     await this.setState({
@@ -237,10 +238,11 @@ export default class extends Component {
     this._translateX.addListener(({ value }) => {
       const boundedValue = Math.min(
         Math.max(value, 0),
-        this.state.dimensionWidth
+        this.state.dimensionWidth,
       );
-    
-      const startingNumberValue = (boundedValue / this.state.dimensionWidth) * this.props.totalDuration;
+
+      const startingNumberValue =
+        (boundedValue / this.state.dimensionWidth) * this.props.totalDuration;
 
       this.setState({
         startingNumberValue,
@@ -248,7 +250,7 @@ export default class extends Component {
           (1 - boundedValue / this.state.dimensionWidth) *
           this.props.totalDuration,
       });
-    
+
       this.onSlide(startingNumberValue);
       return;
     });
@@ -323,7 +325,7 @@ export default class extends Component {
     const scaleStyle = { scale: scaleValue };
 
     return (
-      <View style={styles.root}>
+      <GestureHandlerRootView style={styles.root}>
         <View style={styles.trackContainer} onLayout={this.onLayoutContainer}>
           <TapGestureHandler
             onHandlerStateChange={this.onTap}
@@ -384,7 +386,7 @@ export default class extends Component {
             </Text>
           </View>
         ) : null}
-      </View>
+      </GestureHandlerRootView>
     );
   }
 }
